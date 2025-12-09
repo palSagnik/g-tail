@@ -1,0 +1,15 @@
+<html lang="en">
+    <body>
+        <h2>File Watcher</h2>
+        <p id="response"></p>
+
+        <script>
+            var sse = new EventSource("/log");
+            var response = document.getElementById("response");
+
+            sse.onmessage = function(event) {
+                response.innerHTML += event.data + "<br/>";
+            };
+        </script>
+    </body>
+</html>
