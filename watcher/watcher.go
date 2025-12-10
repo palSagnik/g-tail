@@ -56,10 +56,10 @@ func GetLastNLines(filepath string, n int) ([]string, int64, error) {
 func Watch(filepath string, initialOffset int64, updatesChan chan<- string) {
 	// watcher
 	watcher, err := fsnotify.NewWatcher()
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer watcher.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer watcher.Close()
 
 	// Add file to watcher
 	err = watcher.Add(filepath)
@@ -70,29 +70,26 @@ func Watch(filepath string, initialOffset int64, updatesChan chan<- string) {
 
 	lastOffset := initialOffset
 
-	// Event Loop
-	go func() {
-        for {
-            select {
-            case event, ok := <-watcher.Events:
-                if !ok {
-                    return
-                }
+	// Event Loop (runs directly since Watch is already called as a goroutine)
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
 
-				// Write Modify
-				if event.Has(fsnotify.Write) {
-                    lastOffset = readNewLines(filepath, lastOffset, updatesChan)
+			// Write Modify
+			if event.Has(fsnotify.Write) {
+				lastOffset = readNewLines(filepath, lastOffset, updatesChan)
+			}
 
-                }
-                
-            case err, ok := <-watcher.Errors:
-                if !ok {
-                    return
-                }
-                log.Printf("watcher error: %v\n", err)
-            }
-        }
-    }()
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			log.Printf("watcher error: %v\n", err)
+		}
+	}
 }
 
 // reads from the last known offset
