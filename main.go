@@ -13,7 +13,7 @@ import (
 
 const (
 	LOGFILE = "./app.log"
-	PORT = ":9000"
+	PORT = ":9001"
 )
 
 func main() {
